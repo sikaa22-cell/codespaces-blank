@@ -2,46 +2,42 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Sár-Kert | Pincér Dashboard</title>
+    <title>Sár-Kert | Pincér Dashboard & Napló</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        body { padding: 2rem; max-width: 800px; margin: 0 auto; display: block; background-color: #121212; color: #f0f0f0; }
-        .order-card { background: #1e1e1e; border: 1px solid #c5a059; padding: 1.5rem; margin-bottom: 1rem; border-radius: 8px; animation: slideIn 0.5s ease; }
+        body { padding: 2rem; max-width: 900px; margin: 0 auto; background-color: #121212; color: #f0f0f0; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid #c5a059; padding-bottom: 1rem; }
         
-        /* Jobb alsó felugró ablak stílusa */
-        #custom-toast {
-            position: fixed;
-            bottom: -200px; /* Alaphelyzetben rejtve */
-            right: 20px;
-            background: #c5a059;
-            color: #000;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.8);
-            z-index: 9999;
-            transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            max-width: 300px;
-        }
+        .order-card { background: #1e1e1e; border: 2px solid #333; padding: 1.5rem; margin-bottom: 1.5rem; border-radius: 12px; transition: 0.3s; position: relative; }
+        .order-card.new { border-color: #ff4c4c; box-shadow: 0 0 15px rgba(255, 76, 76, 0.3); animation: pulse 2s infinite; }
+        .order-card.accepted { border-color: #2ecc71; background: #1a2a1f; }
+        
+        .order-number { position: absolute; top: -15px; left: 20px; background: #c5a059; color: #000; padding: 5px 15px; border-radius: 20px; font-weight: bold; font-size: 1.1rem; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        .btn-accept { background: #2ecc71; color: white; flex: 2; }
+        .btn-done { background: #555; color: white; flex: 1; }
+        
+        #custom-toast { position: fixed; bottom: -200px; right: 20px; background: #c5a059; color: #000; padding: 20px; border-radius: 10px; z-index: 9999; transition: 0.5s; }
         #custom-toast.show { bottom: 20px; }
-        #custom-toast h4 { margin-bottom: 5px; font-family: 'Playfair Display', serif; }
         
-        @keyframes slideIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { border-color: #ff4c4c; } 50% { border-color: #333; } 100% { border-color: #ff4c4c; } }
     </style>
 </head>
 <body>
-    <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom:20px;">
-        <h1>Élő Rendelések</h1>
-        <button id="enable-notifications" class="btn-gold">🔔 Értesítések aktiválása</button>
+    <div class="dashboard-header">
+        <h1>👨‍🍳 Pincér Napló</h1>
+        <button id="enable-notifications" class="btn-gold">🔔 Rendszer Aktiválása</button>
     </div>
     
     <div id="orders-container"></div>
     
     <div id="custom-toast">
-        <h4>ÚJ RENDELÉS ÉRKEZETT!</h4>
+        <h4>ÚJ RENDELÉS!</h4>
         <p id="toast-details"></p>
     </div>
 
-    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto" loop></audio>
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
@@ -50,56 +46,75 @@
         const container = document.getElementById('orders-container');
         const alertSound = document.getElementById('alert-sound');
         const toast = document.getElementById('custom-toast');
-        const toastDetails = document.getElementById('toast-details');
+        
+        // Sorszámozás kezelése (Localstorage-ból töltjük be, hogy frissítésnél ne nullázódjon)
+        let orderCount = parseInt(localStorage.getItem('sarkert_order_count')) || 0;
 
         document.getElementById('enable-notifications').onclick = () => {
             Notification.requestPermission();
-            alert('A pincér riasztó rendszer aktív! A hang és a felugró ablak készenlétben.');
+            alert('Sár-Kert Pincér Napló aktív!');
+            alertSound.play(); alertSound.pause(); // Böngésző engedélyezés a hanghoz
         };
 
-        function showToast(order) {
-            toastDetails.innerText = `${order.nev} - ${order.vegosszeg} Ft`;
-            toast.classList.add('show');
-            setTimeout(() => { toast.classList.remove('show'); }, 8000); // 8 mp után eltűnik az ablak
-        }
+        function renderOrder(order, isNew = false) {
+            orderCount++;
+            localStorage.setItem('sarkert_order_count', orderCount);
 
-        function renderOrder(order) {
             const div = document.createElement('div');
-            div.className = 'order-card';
+            div.className = `order-card ${isNew ? 'new' : ''}`;
+            div.id = `order-${order.id}`;
             div.innerHTML = `
+                <div class="order-number">#${orderCount}</div>
                 <h3>${order.nev} | ${order.telefon}</h3>
                 <p>📍 Cím: <strong>${order.cim}</strong></p>
-                <p style="color:#c5a059;">💳 Fizetés: ${order.fizetesi_mod}</p>
-                <ul style="margin: 10px 0;">${order.tetelek.map(t => `<li>${t.nev}</li>`).join('')}</ul>
-                <h2 style="color:white;">${order.vegosszeg} Ft</h2>
-                <button class="btn-gold" style="width:100%; margin-top:10px;" onclick="this.parentElement.remove()">RENDELÉS LEZÁRÁSA</button>
+                <p>💳 Fizetés: ${order.fizetesi_mod}</p>
+                <ul style="margin: 10px 0; padding-left: 20px;">
+                    ${order.tetelek.map(t => `<li>${t.nev} - ${t.ar} Ft</li>`).join('')}
+                </ul>
+                <h2 style="color:#c5a059;">Összesen: ${order.vegosszeg} Ft</h2>
+                <div class="btn-group">
+                    <button class="btn-gold btn-accept" onclick="acceptOrder('${order.id}')">ELFOGAD & HANG STOP</button>
+                    <button class="btn-gold btn-done" onclick="archiveOrder('${order.id}')">LEZÁRÁS</button>
+                </div>
             `;
             container.prepend(div);
         }
 
+        // Rendelés elfogadása (Hang leáll, szín vált)
+        window.acceptOrder = (id) => {
+            const card = document.getElementById(`order-${id}`);
+            card.classList.remove('new');
+            card.classList.add('accepted');
+            const btn = card.querySelector('.btn-accept');
+            btn.innerText = "ELFOGADVA ✅";
+            btn.disabled = true;
+            
+            // Hang leállítása
+            alertSound.pause();
+            alertSound.currentTime = 0;
+        };
+
+        // Rendelés archiválása (Ha már tényleg nem kell látni)
+        window.archiveOrder = (id) => {
+            if(confirm('Biztosan lezárod és eltávolítod a listából ezt a rendelést?')) {
+                document.getElementById(`order-${id}`).style.opacity = '0.3';
+                document.getElementById(`order-${id}`).querySelector('.btn-group').remove();
+            }
+        };
+
         // Supabase figyelés
-        supabase.channel('rendelesek_pincer')
+        supabase.channel('rendelesek_log')
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rendelesek' }, payload => {
-            const newOrder = payload.new;
+            renderOrder(payload.new, true);
             
-            // 1. Rendelés kártya kirakása
-            renderOrder(newOrder);
-            
-            // 2. Jobb alsó ablak felugrasztása
-            showToast(newOrder);
-            
-            // 3. Hangjelzés indítása (12 másodpercig)
-            alertSound.loop = true;
+            // Hang és Értesítés
             alertSound.play();
-            setTimeout(() => { 
-                alertSound.pause(); 
-                alertSound.currentTime = 0; 
-                alertSound.loop = false; 
-            }, 12000); // Pontosan 12 másodperc
+            document.getElementById('toast-details').innerText = `${payload.new.nev} (#${orderCount})`;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 8000);
             
-            // 4. Rendszerszintű értesítés (ha engedélyezve van)
             if (Notification.permission === "granted") {
-                new Notification("SÁR-KERT: ÚJ RENDELÉS!", { body: `${newOrder.nev} (${newOrder.vegosszeg} Ft)` });
+                new Notification("SÁR-KERT: ÚJ RENDELÉS!", { body: `#${orderCount} - ${payload.new.nev}` });
             }
         }).subscribe();
     </script>

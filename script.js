@@ -68,8 +68,8 @@ function openModal(item) {
     const options = document.getElementById('modal-options');
     options.innerHTML = '';
 
-    // 1. Pizzák és Burgerek EXTRÁK (Feltétek)
-    if (item.kategoria === 'Pizzák' || item.kategoria === 'Burgerek') {
+    // 1. Pizzák EXTRÁK (Csak pizzánál jelenik meg!)
+    if (item.kategoria === 'Pizzák') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
         if (feltetek.length > 0) {
             options.innerHTML += '<h4>Extrák:</h4><div class="topping-grid"></div>';
@@ -84,12 +84,12 @@ function openModal(item) {
         }
     }
 
-    // 2. KÖRETVÁLASZTÓ
+    // 2. KÖRETVÁLASZTÓ (Főételek és Burgerek)
     let selectedSides = [];
     if (item.kategoria === 'Burgerek') {
-        selectedSides = burgerSides; // Burgereknél csak Hasáb vagy Steak burgonya
+        selectedSides = burgerSides; // Csak Hasáb vagy Steak burgonya
     } else if (koretesEtelek.includes(item.nev)) {
-        selectedSides = mainSides; // Főételeknél a teljes lista
+        selectedSides = mainSides; // Teljes lista
     }
 
     if (selectedSides.length > 0) {
@@ -108,14 +108,14 @@ document.getElementById('add-to-cart-btn').onclick = () => {
     let totalPrice = parseInt(currentSelectedItem.ar) + PACKAGING_FEE;
     let desc = '';
 
-    // Extrák kiszámítása
+    // Extrák (Csak ha vannak)
     const selected = document.querySelectorAll('.extra-checkbox:checked');
     selected.forEach(cb => {
         totalPrice += parseInt(cb.dataset.price);
         desc += `, ${cb.value}`;
     });
 
-    // Köret hozzáadása
+    // Köret
     const sideSelect = document.getElementById('side-dish-select');
     if (sideSelect && sideSelect.value !== 'Eredeti körettel') {
         desc += ` (Köret: ${sideSelect.value})`;

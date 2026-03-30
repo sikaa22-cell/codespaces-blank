@@ -3,22 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sár-Kert Étterem | Rendelés</title>
+    <title>Sár-Kert Étterem | Prémium Rendelés</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <div class="page-loader"></div>
+    
     <header>
         <div class="header-content">
-            <h1>Sár-Kert Étterem</h1>
+            <div class="logo">
+                <h1>SÁR-KERT</h1>
+                <span>ÉTTEREM</span>
+            </div>
             <div class="cart-icon" id="cart-icon">
-                <i class="fas fa-shopping-cart"></i>
+                <i class="fas fa-shopping-bag"></i>
                 <span id="cart-count">0</span>
             </div>
         </div>
     </header>
 
     <main>
+        <section class="hero-section">
+            <h2>Korszakok és konyhák találkozása</h2>
+            <p>Modern gasztronómia a Dunaparton</p>
+        </section>
+        
         <nav class="categories" id="category-nav"></nav>
         <div class="menu-container" id="menu-container"></div>
     </main>
@@ -26,51 +36,56 @@
     <footer class="site-footer">
         <div class="footer-content">
             <div class="footer-section">
-                <h3>Sár-Kert Étterem</h3>
+                <h3>Kapcsolat</h3>
                 <p>
-                    <strong>Üzemeltető:</strong> Sár-Kert Paks Kft.<br>
-                    <strong>Székhely:</strong> 7030 Paks, Dunapart 1.<br>
-                    <strong>Adószám:</strong> 27435133-2-17<br>
-                    <strong>Kapcsolat:</strong> +36 75 830 830 | info@sarkertpaks.hu
+                    <strong>Üzemeltető:</strong> Sár-Kert Kft. [cite: 13, 191]<br>
+                    <strong>Székhely:</strong> 7030 Paks, Szent János utca 15.<br>
+                    <strong>Adószám:</strong> 32347278-2-17<br>
+                    <strong>Cégjegyzékszám:</strong> 17 09 013742<br>
+                    <strong>Telefonszám:</strong> 0620 530 5848
                 </p>
             </div>
             <div class="footer-section">
                 <h3>Jogi Információk</h3>
                 <ul>
-                    <li><a href="#">Általános Szerződési Feltételek (ÁSZF)</a></li>
-                    <li><a href="#">Adatvédelmi Tájékoztató (GDPR)</a></li>
+                    <li><a href="#">ÁSZF</a></li>
+                    <li><a href="#">Adatkezelési Tájékoztató</a></li>
                 </ul>
             </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Sár-Kert Étterem. Minden jog fenntartva.</p>
         </div>
     </footer>
 
     <div id="product-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content glass">
             <span class="close-modal">&times;</span>
             <h2 id="modal-title"></h2>
             <p id="modal-price" class="gold-text"></p>
             <div id="modal-options"></div>
-            <button id="add-to-cart-btn" class="btn-gold">Kosárba teszem (+200 Ft csomagolás)</button>
+            <button id="add-to-cart-btn" class="btn-gold-premium">KOSÁRBA TESZEM</button>
         </div>
     </div>
 
-    <div id="cart-sidebar" class="sidebar">
+    <div id="cart-sidebar" class="sidebar glass">
         <div class="sidebar-header">
-            <h2>Kosaram</h2>
+            <h2>Kosár</h2>
             <span class="close-cart">&times;</span>
         </div>
         <div id="cart-items"></div>
         <div class="cart-footer">
             <div class="cart-total">
-                <span>Végösszeg:</span>
+                <span>Összesen:</span>
                 <span id="total-price" class="gold-text">0 Ft</span>
             </div>
+            <p class="fee-note">+ 200 Ft csomagolási díj tételenként [cite: 132]</p>
             <form id="checkout-form">
                 <input type="text" id="order-name" placeholder="Név" required>
                 <input type="text" id="order-address" placeholder="Utca, házszám" required>
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" id="order-floor" placeholder="Emelet / Ajtó" style="margin-bottom:0;">
-                    <input type="text" id="order-bell" placeholder="Kapucsengő" style="margin-bottom:0;">
+                <div class="form-row">
+                    <input type="text" id="order-floor" placeholder="Emelet/Ajtó">
+                    <input type="text" id="order-bell" placeholder="Kapucsengő">
                 </div>
                 <input type="tel" id="order-phone" placeholder="Telefonszám" required>
                 <select id="order-payment" required>
@@ -79,13 +94,11 @@
                     <option value="Bankkártya (Futárnál)">Bankkártya a futárnál</option>
                     <option value="SZÉP Kártya - OTP">SZÉP Kártya (OTP)</option>
                 </select>
-                <div class="legal-checkbox-container">
-                    <label class="legal-label">
-                        <input type="checkbox" id="accept-terms" required>
-                        <span>Elfogadom az ÁSZF-et és az Adatkezelési nyilatkozatot.</span>
-                    </label>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="accept-terms" required>
+                    <label for="accept-terms">Elfogadom a feltételeket</label>
                 </div>
-                <button type="submit" class="btn-gold block">Rendelés Leadása</button>
+                <button type="submit" class="btn-gold-premium block">RENDELÉS LEADÁSA</button>
             </form>
         </div>
     </div>

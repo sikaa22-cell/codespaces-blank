@@ -2,76 +2,76 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Sár-Kert | Admin Élő</title>
+    <title>Sár-Kert Admin</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body { padding: 2rem; max-width: 1000px; margin: 0 auto; display: block; }
-        .admin-form { background: var(--card-bg); padding: 2rem; border-radius: 10px; border: 1px solid var(--gold); margin-bottom: 2rem; }
-        .form-row { display: grid; grid-template-columns: 1fr 2fr 1fr auto auto; gap: 10px; align-items: end; }
-        table { width: 100%; color: white; border-collapse: collapse; margin-top: 1rem; }
-        th, td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
-        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
-        .toast { background: var(--gold); color: var(--bg-color); padding: 1rem; border-radius: 8px; margin-bottom: 10px; font-weight: bold; animation: slideIn 0.5s ease; }
-        @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
-    </style>
+    <style>body { padding: 3rem; background: #000; display: block; }</style>
 </head>
 <body>
-    <div id="toast-container"></div>
     <div id="login-screen" style="text-align:center; padding-top: 100px;">
-        <h1>Admin Belépés</h1>
-        <input type="password" id="pass" placeholder="Jelszó">
-        <button class="btn-gold" onclick="login()">Belépés</button>
+        <h1 style="color:white; margin-bottom:20px;">Sár-Kert Adminisztráció</h1>
+        <input type="password" id="pass" placeholder="Jelszó" style="max-width:300px;">
+        <br>
+        <button class="btn-gold-premium" onclick="login()">BELÉPÉS</button>
     </div>
     <div id="admin-content" style="display:none;">
-        <h1>Étlap Kezelő <small style="color:#00ff00; font-size:0.8rem;">● Élő</small></h1>
-        <div class="admin-form">
-            <input type="hidden" id="edit-id">
-            <div class="form-row">
-                <select id="cat"><option>Levesek</option><option>Főételek</option><option>Pizzák</option><option>Desszertek</option></select>
+        <h1 style="color:white; margin-bottom:30px;">Étlap Kezelése</h1>
+        <div class="glass" style="padding:2rem; margin-bottom:2rem;">
+            <div style="display:grid; grid-template-columns: 1fr 2fr 1fr auto; gap:15px; align-items:end;">
+                <select id="cat">
+                    <option>Levesek</option>
+                    <option>Főételek</option>
+                    <option>Burgerek</option>
+                    <option>Pizzák</option>
+                    <option>Desszertek</option>
+                    <option>Italok</option>
+                </select>
                 <input type="text" id="name" placeholder="Étel neve">
                 <input type="number" id="price" placeholder="Ár">
-                <button id="submit-btn" class="btn-gold" onclick="save()">Mentés</button>
-                <button onclick="resetForm()" class="btn-gold" style="background:#444;">Mégse</button>
+                <button class="btn-gold-premium" onclick="save()">MENTÉS</button>
             </div>
         </div>
-        <table id="table"><thead><tr><th>Kategória</th><th>Név</th><th>Ár</th><th>Műveletek</th></tr></thead><tbody id="tbody"></tbody></table>
+        <table style="width:100%; border-collapse: collapse; color:white;" id="table">
+            <thead><tr style="border-bottom: 1px solid #c5a059;"><th style="padding:15px; text-align:left;">Kategória</th><th style="padding:15px; text-align:left;">Név</th><th style="padding:15px; text-align:left;">Ár</th><th style="padding:15px; text-align:right;">Művelet</th></tr></thead>
+            <tbody id="tbody"></tbody>
+        </table>
     </div>
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         const supabase = createClient('https://stbdqxydmzlflnvsogde.supabase.co', 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD');
-        let allItems = [];
-        function notify(msg) {
-            const t = document.createElement('div'); t.className = 'toast'; t.innerText = '✅ ' + msg;
-            document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 3000);
-        }
+        
         window.login = () => {
             if(document.getElementById('pass').value === 'Sarkert2026') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
-                load(); setupRealtime(); notify('Sikeres belépés!');
-            } else { alert('Helytelen jelszó!'); }
+                load();
+            } else alert('Helytelen jelszó!');
         };
+
         async function load() {
             const { data } = await supabase.from('etlap').select('*').order('kategoria');
-            allItems = data;
-            document.getElementById('tbody').innerHTML = data.map(i => `<tr><td>${i.kategoria}</td><td>${i.nev}</td><td>${i.ar} Ft</td><td><button onclick="prepareEdit(${i.id})" class="btn-gold" style="padding:5px 10px;">Szerkesztés</button> <button onclick="del(${i.id})" style="background:red; border:none; color:white; padding:5px 10px; border-radius:4px; cursor:pointer;">Törlés</button></td></tr>`).join('');
+            document.getElementById('tbody').innerHTML = data.map(i => `
+                <tr style="border-bottom: 1px solid #1a1a1a;">
+                    <td style="padding:15px;">${i.kategoria}</td>
+                    <td style="padding:15px;">${i.nev}</td>
+                    <td style="padding:15px;">${i.ar} Ft</td>
+                    <td style="padding:15px; text-align:right;">
+                        <button class="btn-gold-premium" style="padding:5px 10px; font-size:0.7rem;" onclick="del(${i.id})">TÖRLÉS</button>
+                    </td>
+                </tr>`).join('');
         }
-        function setupRealtime() { supabase.channel('changes').on('postgres_changes', { event: '*', schema: 'public', table: 'etlap' }, () => load()).subscribe(); }
-        window.prepareEdit = (id) => {
-            const i = allItems.find(x => x.id === id);
-            document.getElementById('edit-id').value = i.id; document.getElementById('cat').value = i.kategoria;
-            document.getElementById('name').value = i.nev; document.getElementById('price').value = i.ar;
-            window.scrollTo({top:0, behavior:'smooth'});
-        };
-        window.resetForm = () => { document.getElementById('edit-id').value = ""; document.getElementById('name').value = ""; document.getElementById('price').value = ""; };
+
         window.save = async () => {
-            const id = document.getElementById('edit-id').value;
             const item = { kategoria: document.getElementById('cat').value, nev: document.getElementById('name').value, ar: parseInt(document.getElementById('price').value) };
-            if(id) await supabase.from('etlap').update(item).eq('id', id);
-            else await supabase.from('etlap').insert([item]);
-            notify('Sikeres mentés!'); resetForm(); load();
+            await supabase.from('etlap').insert([item]);
+            load();
         };
-        window.del = async (id) => { if(confirm('Törlöd?')) await supabase.from('etlap').delete().eq('id', id); load(); };
+
+        window.del = async (id) => {
+            if(confirm('Biztosan törlöd?')) {
+                await supabase.from('etlap').delete().eq('id', id);
+                load();
+            }
+        };
     </script>
 </body>
 </html>

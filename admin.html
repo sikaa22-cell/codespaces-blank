@@ -2,70 +2,122 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <title>Sár-Kert Admin</title>
+    <title>Sár-Kert Admin | Kezelőpult</title>
     <link rel="stylesheet" href="style.css">
-    <style>body { padding: 2rem; max-width: 1000px; margin: 0 auto; display: block; }</style>
+    <style>
+        body { padding: 2rem; max-width: 1000px; margin: 0 auto; display: block; }
+        .admin-form { background: var(--card-bg); padding: 2rem; border-radius: 10px; border: 1px solid var(--gold); margin-bottom: 2rem; }
+        .form-row { display: grid; grid-template-columns: 1fr 2fr 1fr auto; gap: 10px; align-items: end; }
+        table { width: 100%; color: white; border-collapse: collapse; margin-top: 1rem; }
+        th, td { padding: 12px; border-bottom: 1px solid #333; text-align: left; }
+        #toast-container { position: fixed; top: 20px; right: 20px; z-index: 9999; }
+        .toast { background: var(--gold); color: #000; padding: 1rem; border-radius: 8px; margin-bottom: 10px; font-weight: bold; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+    </style>
 </head>
 <body>
+    <div id="toast-container"></div>
     <div id="login-screen" style="text-align:center; padding-top: 100px;">
-        <h1>Sár-Kert Admin</h1>
-        <input type="password" id="pass" placeholder="Jelszó">
+        <h1>Sár-Kert Admin Belépés</h1>
+        <input type="password" id="pass" placeholder="Jelszó" style="max-width:300px;">
+        <br><br>
         <button class="btn-gold" onclick="login()">Belépés</button>
     </div>
+
     <div id="admin-content" style="display:none;">
-        <h1>Étlap Kezelő</h1>
-        <div class="admin-form" style="background:var(--card-bg); padding:2rem; border:1px solid var(--gold); border-radius:10px; margin-bottom:2rem;">
-            <div style="display:grid; grid-template-columns: 1fr 2fr 1fr auto; gap:10px; align-items:end;">
-                <select id="cat">
-                    <option>Levesek</option>
-                    <option>Főételek</option>
-                    <option>Burgerek</option>
-                    <option>Pizzák</option>
-                    <option>Desszertek</option>
-                    <option>Italok</option>
-                </select>
-                <input type="text" id="name" placeholder="Étel neve">
-                <input type="number" id="price" placeholder="Ár">
-                <button class="btn-gold" onclick="save()">Mentés</button>
+        <h1>Étlap és Feltétek Szerkesztése</h1>
+        <div class="admin-form">
+            <div class="form-row">
+                <div>
+                    <label>Kategória</label>
+                    <select id="cat">
+                        <option>Levesek</option>
+                        <option>Főételek</option>
+                        <option>Burgerek</option>
+                        <option>Pizzák</option>
+                        <option>Desszertek</option>
+                        <option>Italok</option>
+                        <option>Feltét</option> </select>
+                </div>
+                <div>
+                    <label>Név</label>
+                    <input type="text" id="name" placeholder="Étel vagy feltét neve">
+                </div>
+                <div>
+                    <label>Ár (Ft)</label>
+                    <input type="number" id="price" placeholder="400">
+                </div>
+                <button class="btn-gold" onclick="save()">MENTÉS</button>
             </div>
         </div>
-        <table id="table" style="width:100%; color:white;">
-            <thead><tr style="text-align:left; border-bottom:1px solid #333;"><th>Kategória</th><th>Név</th><th>Ár</th><th>Művelet</th></tr></thead>
+
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Kategória</th>
+                    <th>Név</th>
+                    <th>Ár</th>
+                    <th style="text-align:right;">Művelet</th>
+                </tr>
+            </thead>
             <tbody id="tbody"></tbody>
         </table>
     </div>
+
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         const supabase = createClient('https://stbdqxydmzlflnvsogde.supabase.co', 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD');
         
+        function notify(msg) {
+            const t = document.createElement('div'); t.className = 'toast'; t.innerText = '✅ ' + msg;
+            document.getElementById('toast-container').appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        }
+
         window.login = () => {
             if(document.getElementById('pass').value === 'Sarkert2026') {
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 load();
-            } else alert('Helytelen jelszó!');
+            } else { alert('Helytelen jelszó!'); }
         };
 
         async function load() {
             const { data } = await supabase.from('etlap').select('*').order('kategoria');
-            document.getElementById('tbody').innerHTML = data.map(i => `
-                <tr style="border-bottom:1px solid #222;">
-                    <td style="padding:10px;">${i.kategoria}</td>
-                    <td style="padding:10px;">${i.nev}</td>
-                    <td style="padding:10px;">${i.ar} Ft</td>
-                    <td style="padding:10px;"><button class="btn-gold" style="padding:5px 10px; font-size:0.7rem;" onclick="del(${i.id})">Törlés</button></td>
-                </tr>`).join('');
+            if (data) {
+                document.getElementById('tbody').innerHTML = data.map(i => `
+                    <tr style="border-bottom:1px solid #222;">
+                        <td>${i.kategoria}</td>
+                        <td>${i.nev}</td>
+                        <td>${i.ar} Ft</td>
+                        <td style="text-align:right;">
+                            <button onclick="del(${i.id})" style="background:#ff4c4c; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">Törlés</button>
+                        </td>
+                    </tr>`).join('');
+            }
         }
 
         window.save = async () => {
-            const item = { kategoria: document.getElementById('cat').value, nev: document.getElementById('name').value, ar: parseInt(document.getElementById('price').value) };
-            await supabase.from('etlap').insert([item]);
-            load();
+            const nameVal = document.getElementById('name').value;
+            const priceVal = document.getElementById('price').value;
+            const catVal = document.getElementById('cat').value;
+
+            if(!nameVal || !priceVal) { alert('Töltsd ki a nevet és az árat!'); return; }
+
+            const item = { kategoria: catVal, nev: nameVal, ar: parseInt(priceVal) };
+            const { error } = await supabase.from('etlap').insert([item]);
+            
+            if(!error) {
+                notify('Sikeresen mentve: ' + nameVal);
+                document.getElementById('name').value = '';
+                document.getElementById('price').value = '';
+                load();
+            }
         };
 
         window.del = async (id) => {
-            if(confirm('Törlöd?')) {
+            if(confirm('Biztosan törlöd?')) {
                 await supabase.from('etlap').delete().eq('id', id);
+                notify('Törölve.');
                 load();
             }
         };

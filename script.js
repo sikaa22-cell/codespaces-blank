@@ -5,13 +5,12 @@ const SUPABASE_KEY = 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const PACKAGING_FEE = 200;
-const TOPPING_PRICE = 400;
 
 let menuData = [];
 let cart = [];
 let currentSelectedItem = null;
 
-// Fix kategória sorrend: Főételek és Pizzák között a Burgerek
+// Fix sorrend: Burgerek a Főételek és a Pizzák között
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
 const koretesEtelek = [
@@ -24,14 +23,12 @@ const koretesEtelek = [
 ];
 
 const sideDishes = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
-const pizzaToppings = ['Sajt', 'Sonka', 'Gomba', 'Kukorica', 'Hagyma', 'Szalámi', 'Bacon', 'Ananász', 'Jalapeno', 'Olívabogyó', 'Tonhal', 'Tojás', 'Paradicsom', 'Paprika', 'Csirkemell', 'Rukkola', 'Parmezán', 'Fokhagyma', 'Tejföl', 'BBQ', 'Erős Pista', 'Kolbász'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await supabase.from('etlap').select('*');
     if (data) {
         menuData = data;
         renderCategories();
-        // Az első létező kategória megjelenítése a fix sorrend alapján
         const firstCat = categoryOrder.find(cat => menuData.some(item => item.kategoria === cat)) || data[0].kategoria;
         renderMenu(firstCat);
     }
@@ -40,7 +37,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 function renderCategories() {
     const nav = document.getElementById('category-nav');
     nav.innerHTML = '';
-    // Csak azokat a kategóriákat jelenítjük meg, amikben van étel, a megadott sorrendben
     categoryOrder.forEach(cat => {
         if (menuData.some(item => item.kategoria === cat)) {
             const btn = document.createElement('button');
@@ -76,10 +72,14 @@ function openModal(item) {
     options.innerHTML = '';
 
     if (item.kategoria === 'Pizzák') {
-        options.innerHTML = '<div class="topping-grid"></div>';
-        pizzaToppings.forEach(t => {
-            options.querySelector('.topping-grid').innerHTML += `<label class="topping-label"><input type="checkbox" value="${t}" class="pizza-topping"> ${t}</label>`;
-        });
+        const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
+        if (feltetek.length > 0) {
+            options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
+            const grid = options.querySelector('.topping-grid');
+            feltetek.forEach(f => {
+                grid.innerHTML += `<label class="topping-label"><input type="checkbox" value="${f.nev}" data-price="${f.ar}" class="pizza-topping"> ${f.nev} (+${f.ar} Ft)</label>`;
+            });
+        }
     } else if (koretesEtelek.includes(item.nev)) {
         options.innerHTML = `<h4>Válassz köretet:</h4><select id="side-dish-select" style="width:100%; padding:0.8rem; margin-top:0.5rem; background:#2a2a2a; color:white; border:1px solid var(--gold);"><option value="Eredeti körettel">Eredeti körettel kérem</option>${sideDishes.map(sd => `<option value="${sd}">${sd}</option>`).join('')}</select>`;
     }
@@ -90,9 +90,11 @@ document.getElementById('add-to-cart-btn').onclick = () => {
     let price = currentSelectedItem.ar + PACKAGING_FEE;
     let desc = '';
     if (currentSelectedItem.kategoria === 'Pizzák') {
-        const selected = Array.from(document.querySelectorAll('.pizza-topping:checked')).map(c => c.value);
-        price += selected.length * TOPPING_PRICE;
-        if(selected.length > 0) desc = ` (+ ${selected.join(', ')})`;
+        const selectedCheckboxes = Array.from(document.querySelectorAll('.pizza-topping:checked'));
+        const selectedNames = selectedCheckboxes.map(c => c.value);
+        const extraPrice = selectedCheckboxes.reduce((sum, cb) => sum + parseInt(cb.dataset.price), 0);
+        price += extraPrice;
+        if(selectedNames.length > 0) desc = ` (+ ${selectedNames.join(', ')})`;
     } else if (koretesEtelek.includes(currentSelectedItem.nev)) {
         const koret = document.getElementById('side-dish-select').value;
         if(koret !== 'Eredeti körettel') desc = ` (Köret: ${koret})`;

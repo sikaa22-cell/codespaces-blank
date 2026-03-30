@@ -20,8 +20,7 @@
 
     <main>
         <nav class="categories" id="category-nav"></nav>
-        <div class="menu-container" id="menu-container">
-            </div>
+        <div class="menu-container" id="menu-container"></div>
     </main>
 
     <footer class="site-footer">
@@ -29,24 +28,19 @@
             <div class="footer-section">
                 <h3>Sár-Kert Étterem</h3>
                 <p>
-                    <strong>Üzemeltető:</strong> [Sár-Kert Kft.]<br>
-                    <strong>Székhely:</strong> 7030 Paks, [Szent Janos utca, 15]<br>
-                    <strong>Adószám:</strong> [ 32347278-2-17]<br>
-                    <strong>Cégjegyzékszám:</strong> [17-09-013742]<br>
-                    <strong>Kapcsolat:</strong> hello@sarkert.hu | +36 20 530 5848
+                    <strong>Üzemeltető:</strong> [Céged Neve Kft.]<br>
+                    <strong>Székhely:</strong> 7030 Paks, [Utca, házszám]<br>
+                    <strong>Adószám:</strong> [Adószám]<br>
+                    <strong>Kapcsolat:</strong> info@sarkert.hu
                 </p>
             </div>
             <div class="footer-section">
                 <h3>Jogi Információk</h3>
                 <ul>
-                    <li><a href="#">Általános Szerződési Feltételek (ÁSZF)</a></li>
+                    <li><a href="#">ÁSZF</a></li>
                     <li><a href="#">Adatvédelmi Tájékoztató</a></li>
-                    <li><a href="#">Impresszum</a></li>
                 </ul>
             </div>
-        </div>
-        <div class="footer-bottom">
-            &copy; 2026 Sár-Kert Étterem. Minden jog fenntartva.
         </div>
     </footer>
 
@@ -73,30 +67,31 @@
             </div>
             <form id="checkout-form">
                 <input type="text" id="order-name" placeholder="Név" required>
-                <input type="text" id="order-address" placeholder="Szállítási cím" required>
-                <input type="tel" id="order-phone" placeholder="Telefonszám" required>
+                <input type="text" id="order-address" placeholder="Utca, házszám" required>
                 
-                <select id="order-payment" required>
-                    <option value="" disabled selected>Válassz fizetési módot...</option>
-                    <option value="Készpénz (Futárnál)">Fizetés a futárnál készpénzzel</option>
-                    <option value="Bankkártya (Futárnál)">Fizetés a futárnál bankkártyával</option>
-                    <option value="SZÉP Kártya - OTP (Futárnál)">Fizetés a futárnál SZÉP kártyával (OTP)</option>
-                </select>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" id="order-floor" placeholder="Emelet / Ajtó" style="margin-bottom:0;">
+                    <input type="text" id="order-bell" placeholder="Kapucsengő" style="margin-bottom:0;">
+                </div>
 
+                <input type="tel" id="order-phone" placeholder="Telefonszám" required>
+                <select id="order-payment" required>
+                    <option value="" disabled selected>Fizetési mód...</option>
+                    <option value="Készpénz (Futárnál)">Készpénz a futárnál</option>
+                    <option value="Bankkártya (Futárnál)">Bankkártya a futárnál</option>
+                    <option value="SZÉP Kártya - OTP">SZÉP Kártya (OTP)</option>
+                </select>
                 <div class="legal-checkbox-container">
                     <label class="legal-label">
                         <input type="checkbox" id="accept-terms" required>
-                        <span>Elfogadom az <a href="#" target="_blank">ÁSZF</a>-et és az <a href="#" target="_blank">Adatvédelmi tájékoztatót</a>. Megrendelésem fizetési kötelezettséggel jár.</span>
+                        <span>Elfogadom az ÁSZF-et és az Adatkezelést.</span>
                     </label>
                 </div>
-
                 <button type="submit" class="btn-gold block">Rendelés Leadása</button>
             </form>
         </div>
     </div>
-
     <div class="overlay" id="overlay"></div>
-
     <script type="module" src="script.js"></script>
 </body>
 </html>

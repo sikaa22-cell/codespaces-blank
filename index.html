@@ -28,7 +28,7 @@
             <div class="footer-section">
                 <h3>Sár-Kert Étterem</h3>
                 <p>
-                    <strong>Üzemeltető:</strong> Sár-Kert Kft. [cite: 13]<br>
+                    <strong>Üzemeltető:</strong> Sár-Kert Kft.<br>
                     <strong>Székhely:</strong> 7030 Paks, Szent János utca 15.<br>
                     <strong>Adószám:</strong> 32347278-2-17<br>
                     <strong>Cégjegyzékszám:</strong> 17 09 013742<br>
@@ -38,8 +38,8 @@
             <div class="footer-section">
                 <h3>Jogi Információk</h3>
                 <ul>
-                    <li><a href="#">Általános Szerződési Feltételek (ÁSZF)</a></li>
-                    <li><a href="#">Adatvédelmi Tájékoztató</a></li>
+                    <li>ÁSZF</li>
+                    <li>Adatkezelési Tájékoztató</li>
                 </ul>
             </div>
         </div>
@@ -60,41 +60,30 @@
             <h2>Kosaram</h2>
             <span class="close-cart">&times;</span>
         </div>
-        
         <div class="cart-scroll-area">
             <div id="cart-items"></div>
-            
             <div class="cart-summary-section">
                 <div class="cart-total">
                     <span>Végösszeg:</span>
                     <span id="total-price" class="gold-text">0 Ft</span>
                 </div>
             </div>
-
             <div class="checkout-section">
                 <h3>Szállítási adatok</h3>
                 <form id="checkout-form">
-                    <div class="input-group">
-                        <input type="text" id="order-name" placeholder="Név" required>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="order-address" placeholder="Utca, házszám" required>
-                    </div>
+                    <input type="text" id="order-name" placeholder="Név" required>
+                    <input type="text" id="order-address" placeholder="Utca, házszám" required>
                     <div class="form-row">
-                        <input type="text" id="order-floor" placeholder="Emelet / Ajtó">
+                        <input type="text" id="order-floor" placeholder="Emelet/Ajtó">
                         <input type="text" id="order-bell" placeholder="Kapucsengő">
                     </div>
-                    <div class="input-group">
-                        <input type="tel" id="order-phone" placeholder="Telefonszám" required>
-                    </div>
-                    <div class="input-group">
-                        <select id="order-payment" required>
-                            <option value="" disabled selected>Fizetési mód...</option>
-                            <option value="Készpénz (Futárnál)">Készpénz a futárnál</option>
-                            <option value="Bankkártya (Futárnál)">Bankkártya a futárnál</option>
-                            <option value="SZÉP Kártya - OTP">SZÉP Kártya (OTP)</option>
-                        </select>
-                    </div>
+                    <input type="tel" id="order-phone" placeholder="Telefonszám" required>
+                    <select id="order-payment" required>
+                        <option value="" disabled selected>Fizetési mód...</option>
+                        <option value="Készpénz (Futárnál)">Készpénz a futárnál</option>
+                        <option value="Bankkártya (Futárnál)">Bankkártya a futárnál</option>
+                        <option value="SZÉP Kártya - OTP">SZÉP Kártya (OTP)</option>
+                    </select>
                     <div class="legal-checkbox-container">
                         <label class="legal-label">
                             <input type="checkbox" id="accept-terms" required>
@@ -106,7 +95,6 @@
             </div>
         </div>
     </div>
-    
     <div class="overlay" id="overlay"></div>
     <script type="module" src="script.js"></script>
 </body>

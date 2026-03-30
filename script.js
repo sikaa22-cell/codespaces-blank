@@ -4,25 +4,12 @@ const SUPABASE_URL = 'https://stbdqxydmzlflnvsogde.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PACKAGING_FEE = 200; // Dobozonként 200 Ft [cite: 131]
-
+const PACKAGING_FEE = 200;
 let menuData = [];
 let cart = [];
 let currentSelectedItem = null;
 
-// Kategória sorrend fixálva: Levesek, Főételek, Burgerek, Pizzák, Desszertek, Italok
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
-
-const koretesEtelek = [
-    'Roston sült csirkemell, párolt jázmin rizs és kompót', [cite: 94]
-    'Rántott sajt, párolt jázmin rizs, tartár mártás', [cite: 94]
-    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé', [cite: 89]
-    'Lazac burger, guacamole, uborka, lollo saláta', [cite: 29]
-    'Vegan cheese burger, cékla ketchup', [cite: 52]
-    '"Bacon and Cheese" Beef Burger' [cite: 90]
-];
-
-const sideDishes = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await supabase.from('etlap').select('*');
@@ -73,15 +60,13 @@ function openModal(item) {
 
     if (item.kategoria === 'Pizzák') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
-        if (feltetek.length > 0) {
-            options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
-            const grid = options.querySelector('.topping-grid');
-            feltetek.forEach(f => {
-                grid.innerHTML += `<label class="topping-label"><input type="checkbox" value="${f.nev}" data-price="${f.ar}" class="pizza-topping"> ${f.nev} (+${f.ar} Ft)</label>`;
-            });
-        }
-    } else if (koretesEtelek.includes(item.nev)) {
-        options.innerHTML = `<h4>Válassz köretet:</h4><select id="side-dish-select" style="width:100%; padding:0.8rem; margin-top:0.5rem; background:#2a2a2a; color:white; border:1px solid var(--gold);"><option value="Eredeti körettel">Eredeti körettel kérem</option>${sideDishes.map(sd => `<option value="${sd}">${sd}</option>`).join('')}</select>`;
+        options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
+        feltetek.forEach(f => {
+            options.querySelector('.topping-grid').innerHTML += `
+                <label class="topping-label" style="display:block; margin:5px 0; cursor:pointer;">
+                    <input type="checkbox" value="${f.nev}" data-price="${f.ar}" class="pizza-topping"> ${f.nev} (+${f.ar} Ft)
+                </label>`;
+        });
     }
     document.getElementById('product-modal').style.display = 'flex';
 }
@@ -90,13 +75,9 @@ document.getElementById('add-to-cart-btn').onclick = () => {
     let price = currentSelectedItem.ar + PACKAGING_FEE;
     let desc = '';
     if (currentSelectedItem.kategoria === 'Pizzák') {
-        const selectedCheckboxes = Array.from(document.querySelectorAll('.pizza-topping:checked'));
-        const extraPrice = selectedCheckboxes.reduce((sum, cb) => sum + parseInt(cb.dataset.price), 0);
-        price += extraPrice;
-        if(selectedCheckboxes.length > 0) desc = ` (+ ${selectedCheckboxes.map(c => c.value).join(', ')})`;
-    } else if (koretesEtelek.includes(currentSelectedItem.nev)) {
-        const koret = document.getElementById('side-dish-select').value;
-        if(koret !== 'Eredeti körettel') desc = ` (Köret: ${koret})`;
+        const selected = Array.from(document.querySelectorAll('.pizza-topping:checked'));
+        price += selected.reduce((sum, cb) => sum + parseInt(cb.dataset.price), 0);
+        if(selected.length > 0) desc = ` (+ ${selected.map(c => c.value).join(', ')})`;
     }
     cart.push({ nev: currentSelectedItem.nev + desc, ar: price });
     updateCartUI();
@@ -110,7 +91,7 @@ function updateCartUI() {
     let total = 0;
     cart.forEach((item, i) => {
         total += item.ar;
-        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button class="remove-btn" onclick="removeFromCart(${i})">×</button></span></div>`;
+        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button onclick="removeFromCart(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px; font-weight:bold;">×</button></span></div>`;
     });
     document.getElementById('total-price').innerText = `${total} Ft`;
 }

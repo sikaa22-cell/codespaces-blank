@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sár-Kert Étterem | Rendelés</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Sár-Kert Étterem</h1>
+            <div class="cart-icon" id="cart-icon">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <nav class="categories" id="category-nav"></nav>
+        <div class="menu-container" id="menu-container">
+            </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Sár-Kert Étterem</h3>
+                <p>
+                    <strong>Üzemeltető:</strong> [Sár-Kert Kft.]<br>
+                    <strong>Székhely:</strong> 7030 Paks, [Szent Janos utca, 15]<br>
+                    <strong>Adószám:</strong> [ 32347278-2-17]<br>
+                    <strong>Cégjegyzékszám:</strong> [17-09-013742]<br>
+                    <strong>Kapcsolat:</strong> hello@sarkert.hu | +36 20 530 5848
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Jogi Információk</h3>
+                <ul>
+                    <li><a href="#">Általános Szerződési Feltételek (ÁSZF)</a></li>
+                    <li><a href="#">Adatvédelmi Tájékoztató</a></li>
+                    <li><a href="#">Impresszum</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2026 Sár-Kert Étterem. Minden jog fenntartva.
+        </div>
+    </footer>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal">&times;</span>
+            <h2 id="modal-title"></h2>
+            <p id="modal-price" class="gold-text"></p>
+            <div id="modal-options"></div>
+            <button id="add-to-cart-btn" class="btn-gold">Kosárba teszem (+200 Ft csomagolás)</button>
+        </div>
+    </div>
+
+    <div id="cart-sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h2>Kosaram</h2>
+            <span class="close-cart">&times;</span>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Végösszeg:</span>
+                <span id="total-price" class="gold-text">0 Ft</span>
+            </div>
+            <form id="checkout-form">
+                <input type="text" id="order-name" placeholder="Név" required>
+                <input type="text" id="order-address" placeholder="Szállítási cím" required>
+                <input type="tel" id="order-phone" placeholder="Telefonszám" required>
+                
+                <select id="order-payment" required>
+                    <option value="" disabled selected>Válassz fizetési módot...</option>
+                    <option value="Készpénz (Futárnál)">Fizetés a futárnál készpénzzel</option>
+                    <option value="Bankkártya (Futárnál)">Fizetés a futárnál bankkártyával</option>
+                    <option value="SZÉP Kártya - OTP (Futárnál)">Fizetés a futárnál SZÉP kártyával (OTP)</option>
+                </select>
+
+                <div class="legal-checkbox-container">
+                    <label class="legal-label">
+                        <input type="checkbox" id="accept-terms" required>
+                        <span>Elfogadom az <a href="#" target="_blank">ÁSZF</a>-et és az <a href="#" target="_blank">Adatvédelmi tájékoztatót</a>. Megrendelésem fizetési kötelezettséggel jár.</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-gold block">Rendelés Leadása</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>

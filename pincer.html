@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sár-Kert Étterem | Pincér Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body { padding: 2rem; max-width: 800px; margin: 0 auto; }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; border-bottom: 2px solid var(--gold); padding-bottom: 1rem;}
+        
+        /* Állapot jelzők */
+        .status-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 15px; font-size: 0.8rem; font-weight: bold; background: #8b0000; color: white;}
+        .status-badge.rogzitve { background: #006400; }
+        
+        /* Fizetési infó kiemelése */
+        .payment-info { 
+            background: rgba(197, 160, 89, 0.1); 
+            padding: 0.6rem 1rem; 
+            border-radius: 8px; 
+            border: 1px solid var(--gold); 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 10px;
+            margin: 1rem 0; 
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        #enable-notifications {
+            background: var(--gold);
+            border: none;
+            color: var(--bg-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: none;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(197, 160, 89, 0.3);
+        }
+        #enable-notifications:hover { transform: scale(1.05); background: var(--gold-hover); }
+
+        .order-card h3 { font-size: 1.4rem; color: var(--gold); }
+        .order-card ul { list-style: none; padding: 0; margin: 1rem 0; border-top: 1px solid #333; padding-top: 1rem; }
+        .order-card li { padding: 0.3rem 0; border-bottom: 1px solid #2a2a2a; display: flex; justify-content: space-between; }
+    </style>
+</head>
+<body>
+    <div class="dashboard-header">
+        <h1>Élő Rendelések</h1>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button id="enable-notifications">🔔 Értesítések bekapcsolása</button>
+            <div id="connection-status" class="gold-text">Csatlakozás...</div>
+        </div>
+    </div>
+
+    <div id="orders-container">
+        </div>
+
+    <audio id="alert-sound" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" preload="auto"></audio>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
+        const SUPABASE_URL = 'https://stbdqxydmzlflnvsogde.supabase.co'; 
+        const SUPABASE_KEY = 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const container = document.getElementById('orders-container');
+        const alertSound = document.getElementById('alert-sound');
+        const notifBtn = document.getElementById('enable-notifications');
+
+        // Értesítési engedély kérése
+        if ("Notification" in window) {
+            if (Notification.permission !== "granted") {
+                notifBtn.style.display = "block";
+                notifBtn.onclick = () => {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") notifBtn.style.display = "none";
+                    });
+                };
+            }
+        }
+
+        async function loadOrders() {
+            const { data, error } = await supabase
+                .from('rendelesek')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(20);
+            
+            if (data) data.forEach(renderOrder);
+            document.getElementById('connection-status').innerText = 'Online - Várakozás...';
+        }
+
+        function renderOrder(order) {
+            const div = document.createElement('div');
+            div.className = 'order-card';
+            div.id = `order-${order.id}`;
+            
+            let itemsHtml = order.tetelek.map(t => `<li><span>${t.nev}</span> <span>${t.ar} Ft</span></li>`).join('');
+            let isRogzitve = order.statusz === 'rogzitve';
+            let fizetes = order.fizetesi_mod || 'Készpénz';
+
+            div.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h3>${order.nev}</h3>
+                        <p style="font-weight: 600; margin: 5px 0;">📞 ${order.telefon}</p>
+                    </div>
+                    <span class="status-badge ${isRogzitve ? 'rogzitve' : ''}" id="badge-${order.id}">
+                        ${isRogzitve ? 'Rögzítve' : 'ÚJ RENDELÉS'}
+                    </span>
+                </div>
+                <p class="text-muted">📍 Cím: ${order.cim}</p>
+                <div class="payment-info gold-text">
+                    💳 Fizetés: ${fizetes}
+                </div>
+                <ul>${itemsHtml}</ul>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <h2 class="gold-text" style="margin:0;">${order.vegosszeg} Ft</h2>
+                    ${!isRogzitve ? `<button class="btn-gold" onclick="markAsDone('${order.id}')">Rögzítve (OK)</button>` : ''}
+                </div>
+            `;
+            
+            container.prepend(div);
+        }
+
+        window.markAsDone = async (id) => {
+            const { error } = await supabase.from('rendelesek').update({ statusz: 'rogzitve' }).eq('id', id);
+            if(!error) {
+                const btn = document.querySelector(`#order-${id} button`);
+                if(btn) btn.remove();
+                const badge = document.getElementById(`badge-${id}`);
+                badge.className = 'status-badge rogzitve';
+                badge.innerText = 'Rögzítve';
+                
+                // Ha a pincér rögzíti a rendelést, azonnal némítjuk a riasztót is (ha még szól)
+                alertSound.pause();
+                alertSound.currentTime = 0;
+            }
+        };
+
+        supabase.channel('rendelesek_channel')
+            .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rendelesek' }, payload => {
+                
+                // --- ÚJ LOGIKA: 10 másodperces riasztás ---
+                alertSound.loop = true; // Bekapcsoljuk az ismétlést
+                alertSound.play().catch(e => console.log("Hang hiba:", e));
+                
+                // 10 000 ms (10 másodperc) múlva leállítjuk a hangot
+                setTimeout(() => {
+                    alertSound.pause();
+                    alertSound.currentTime = 0; // Visszatekerjük az elejére
+                }, 10000);
+                
+                // Asztali értesítés küldése
+                if ("Notification" in window && Notification.permission === "granted") {
+                    const notification = new Notification("🔥 ÚJ RENDELÉS ÉRKEZETT!", {
+                        body: `${payload.new.nev} - ${payload.new.vegosszeg} Ft\nFizetés: ${payload.new.fizetesi_mod}\nKattints a megnyitáshoz!`,
+                        icon: 'https://cdn-icons-png.flaticon.com/512/3448/3448609.png',
+                        requireInteraction: true, 
+                        tag: 'uj-rendeles-' + payload.new.id 
+                    });
+                    
+                    notification.onclick = function() {
+                        window.focus();
+                        this.close();
+                    };
+                }
+
+                renderOrder(payload.new);
+            })
+            .subscribe();
+
+        loadOrders();
+    </script>
+</body>
+</html>

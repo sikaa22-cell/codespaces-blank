@@ -10,7 +10,7 @@ let menuData = [];
 let cart = [];
 let currentSelectedItem = null;
 
-// Fix sorrend: Burgerek a Főételek és a Pizzák között
+// Kategória sorrend fixálva: Levesek, Főételek, Burgerek, Pizzák, Desszertek, Italok
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
 const koretesEtelek = [
@@ -91,10 +91,9 @@ document.getElementById('add-to-cart-btn').onclick = () => {
     let desc = '';
     if (currentSelectedItem.kategoria === 'Pizzák') {
         const selectedCheckboxes = Array.from(document.querySelectorAll('.pizza-topping:checked'));
-        const selectedNames = selectedCheckboxes.map(c => c.value);
         const extraPrice = selectedCheckboxes.reduce((sum, cb) => sum + parseInt(cb.dataset.price), 0);
         price += extraPrice;
-        if(selectedNames.length > 0) desc = ` (+ ${selectedNames.join(', ')})`;
+        if(selectedCheckboxes.length > 0) desc = ` (+ ${selectedCheckboxes.map(c => c.value).join(', ')})`;
     } else if (koretesEtelek.includes(currentSelectedItem.nev)) {
         const koret = document.getElementById('side-dish-select').value;
         if(koret !== 'Eredeti körettel') desc = ` (Köret: ${koret})`;

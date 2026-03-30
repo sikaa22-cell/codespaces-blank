@@ -36,11 +36,12 @@
                         <option>Pizzák</option>
                         <option>Desszertek</option>
                         <option>Italok</option>
-                        <option>Feltét</option> </select>
+                        <option>Feltét</option>
+                    </select>
                 </div>
                 <div>
                     <label>Név</label>
-                    <input type="text" id="name" placeholder="Étel vagy feltét neve">
+                    <input type="text" id="name" placeholder="Név">
                 </div>
                 <div>
                     <label>Ár (Ft)</label>
@@ -52,12 +53,7 @@
 
         <table id="table">
             <thead>
-                <tr>
-                    <th>Kategória</th>
-                    <th>Név</th>
-                    <th>Ár</th>
-                    <th style="text-align:right;">Művelet</th>
-                </tr>
+                <tr><th>Kategória</th><th>Név</th><th>Ár</th><th style="text-align:right;">Művelet</th></tr>
             </thead>
             <tbody id="tbody"></tbody>
         </table>
@@ -97,27 +93,17 @@
         }
 
         window.save = async () => {
-            const nameVal = document.getElementById('name').value;
-            const priceVal = document.getElementById('price').value;
-            const catVal = document.getElementById('cat').value;
-
-            if(!nameVal || !priceVal) { alert('Töltsd ki a nevet és az árat!'); return; }
-
-            const item = { kategoria: catVal, nev: nameVal, ar: parseInt(priceVal) };
-            const { error } = await supabase.from('etlap').insert([item]);
-            
-            if(!error) {
-                notify('Sikeresen mentve: ' + nameVal);
-                document.getElementById('name').value = '';
-                document.getElementById('price').value = '';
-                load();
-            }
+            const item = { kategoria: document.getElementById('cat').value, nev: document.getElementById('name').value, ar: parseInt(document.getElementById('price').value) };
+            await supabase.from('etlap').insert([item]);
+            notify('Mentve.');
+            document.getElementById('name').value = '';
+            document.getElementById('price').value = '';
+            load();
         };
 
         window.del = async (id) => {
-            if(confirm('Biztosan törlöd?')) {
+            if(confirm('Törlöd?')) {
                 await supabase.from('etlap').delete().eq('id', id);
-                notify('Törölve.');
                 load();
             }
         };

@@ -4,7 +4,7 @@ const SUPABASE_URL = 'https://stbdqxydmzlflnvsogde.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_-mQj4leakzhkMZNuiAgYZg_EARP4OUD';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const PACKAGING_FEE = 200;
+const PACKAGING_FEE = 200; // Dobozonként 200 Ft [cite: 131]
 
 let menuData = [];
 let cart = [];
@@ -14,12 +14,12 @@ let currentSelectedItem = null;
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
 const koretesEtelek = [
-    'Roston sült csirkemell, párolt jázmin rizs és kompót',
-    'Rántott sajt, párolt jázmin rizs, tartár mártás',
-    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé',
-    'Lazac burger, guacamole, uborka, lollo saláta',
-    'Vegan cheese burger, cékla ketchup',
-    '"Bacon and Cheese" Beef Burger'
+    'Roston sült csirkemell, párolt jázmin rizs és kompót', [cite: 94]
+    'Rántott sajt, párolt jázmin rizs, tartár mártás', [cite: 94]
+    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé', [cite: 89]
+    'Lazac burger, guacamole, uborka, lollo saláta', [cite: 29]
+    'Vegan cheese burger, cékla ketchup', [cite: 52]
+    '"Bacon and Cheese" Beef Burger' [cite: 90]
 ];
 
 const sideDishes = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];

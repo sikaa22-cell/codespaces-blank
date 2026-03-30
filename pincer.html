@@ -25,32 +25,27 @@
         const alertSound = document.getElementById('alert-sound');
 
         document.getElementById('enable-notifications').onclick = () => {
-            Notification.requestPermission().then(p => { if(p === 'granted') alert('Értesítések aktívak!'); });
+            Notification.requestPermission();
+            alert('A pincér riasztó rendszer aktív!');
         };
 
         function renderOrder(order) {
             const div = document.createElement('div');
             div.className = 'order-card';
             div.innerHTML = `
-                <h3>${order.nev} - ${order.telefon}</h3>
-                <p>📍 Cím: <strong>${order.cim}</strong></p>
+                <h3>${order.nev} | ${order.telefon}</h3>
+                <p>📍 Cím: ${order.cim}</p>
                 <p style="color:var(--gold);">💳 Fizetés: ${order.fizetesi_mod}</p>
                 <ul>${order.tetelek.map(t => `<li>${t.nev}</li>`).join('')}</ul>
                 <h2 class="gold-text">${order.vegosszeg} Ft</h2>
-                <button class="btn-gold block" onclick="this.parentElement.remove()">Kész / Törlés</button>
+                <button class="btn-gold block" onclick="this.parentElement.remove()">RENDELÉS KÉSZ / TÖRLÉS</button>
             `;
             container.prepend(div);
         }
 
-        supabase.channel('custom-all-channel')
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rendelesek' }, payload => {
+        supabase.channel('rendelesek').on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'rendelesek' }, payload => {
             renderOrder(payload.new);
-            alertSound.loop = true;
             alertSound.play();
-            setTimeout(() => { alertSound.pause(); alertSound.currentTime = 0; alertSound.loop = false; }, 10000);
-            if (Notification.permission === "granted") {
-                new Notification("ÚJ RENDELÉS!", { body: `${payload.new.nev} - ${payload.new.vegosszeg} Ft`, requireInteraction: true });
-            }
         }).subscribe();
     </script>
 </body>

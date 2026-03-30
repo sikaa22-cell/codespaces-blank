@@ -11,6 +11,16 @@ let currentSelectedItem = null;
 
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
+// Főételek, amikhez jár az alap köretválasztó
+const koretesEtelek = [
+    'Roston sült csirkemell, párolt jázmin rizs és kompót',
+    'Rántott sajt, párolt jázmin rizs, tartár mártás',
+    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé'
+];
+
+const mainSides = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
+const burgerSides = ['Hasábburgonya', 'Házi steak burgonya'];
+
 document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await supabase.from('etlap').select('*');
     if (data) {
@@ -58,10 +68,11 @@ function openModal(item) {
     const options = document.getElementById('modal-options');
     options.innerHTML = '';
 
+    // 1. Pizzák és Burgerek EXTRÁK (Feltétek)
     if (item.kategoria === 'Pizzák' || item.kategoria === 'Burgerek') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
         if (feltetek.length > 0) {
-            options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
+            options.innerHTML += '<h4>Extrák:</h4><div class="topping-grid"></div>';
             const grid = options.querySelector('.topping-grid');
             feltetek.forEach(f => {
                 grid.innerHTML += `
@@ -72,19 +83,44 @@ function openModal(item) {
             });
         }
     }
+
+    // 2. KÖRETVÁLASZTÓ
+    let selectedSides = [];
+    if (item.kategoria === 'Burgerek') {
+        selectedSides = burgerSides; // Burgereknél csak Hasáb vagy Steak burgonya
+    } else if (koretesEtelek.includes(item.nev)) {
+        selectedSides = mainSides; // Főételeknél a teljes lista
+    }
+
+    if (selectedSides.length > 0) {
+        options.innerHTML += `
+            <h4>Válassz köretet:</h4>
+            <select id="side-dish-select" style="width:100%; padding:0.8rem; margin:15px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
+                <option value="Eredeti körettel">Eredeti körettel kérem</option>
+                ${selectedSides.map(sd => `<option value="${sd}">${sd}</option>`).join('')}
+            </select>`;
+    }
+
     document.getElementById('product-modal').style.display = 'flex';
 }
 
 document.getElementById('add-to-cart-btn').onclick = () => {
     let totalPrice = parseInt(currentSelectedItem.ar) + PACKAGING_FEE;
-    let extras = [];
+    let desc = '';
+
+    // Extrák kiszámítása
     const selected = document.querySelectorAll('.extra-checkbox:checked');
     selected.forEach(cb => {
         totalPrice += parseInt(cb.dataset.price);
-        extras.push(cb.value);
+        desc += `, ${cb.value}`;
     });
 
-    let desc = extras.length > 0 ? ` (+ ${extras.join(', ')})` : '';
+    // Köret hozzáadása
+    const sideSelect = document.getElementById('side-dish-select');
+    if (sideSelect && sideSelect.value !== 'Eredeti körettel') {
+        desc += ` (Köret: ${sideSelect.value})`;
+    }
+
     cart.push({ nev: currentSelectedItem.nev + desc, ar: totalPrice });
     updateCartUI();
     document.getElementById('product-modal').style.display = 'none';
@@ -97,7 +133,7 @@ function updateCartUI() {
     let total = 0;
     cart.forEach((item, i) => {
         total += item.ar;
-        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button onclick="removeFromCart(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">×</button></span></div>`;
+        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button onclick="removeFromCart(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px; font-weight:bold;">×</button></span></div>`;
     });
     document.getElementById('total-price').innerText = `${total} Ft`;
 }

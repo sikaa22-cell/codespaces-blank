@@ -38,8 +38,8 @@
             <div class="footer-section">
                 <h3>Jogi Információk</h3>
                 <ul>
-                    <li><a href="#">Általános Szerződési Feltételek (ÁSZF)</a></li>
-                    <li><a href="#">Adatkezelési Tájékoztató</a></li>
+                    <li>ÁSZF</li>
+                    <li>Adatkezelési Tájékoztató</li>
                 </ul>
             </div>
         </div>
@@ -62,11 +62,9 @@
         </div>
         <div class="cart-scroll-area">
             <div id="cart-items"></div>
-            <div class="cart-summary-section">
-                <div class="cart-total">
-                    <span>Végösszeg:</span>
-                    <span id="total-price" class="gold-text">0 Ft</span>
-                </div>
+            <div class="cart-total" style="padding: 1.5rem 0; border-top: 2px solid #c5a059; margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1.3rem;">
+                <span>Végösszeg:</span>
+                <span id="total-price" class="gold-text">0 Ft</span>
             </div>
             <div class="checkout-section">
                 <h3>Szállítási adatok</h3>
@@ -80,22 +78,19 @@
                     <input type="tel" id="order-phone" placeholder="Telefonszám" required>
                     <select id="order-payment" required>
                         <option value="" disabled selected>Fizetési mód...</option>
-                        <option value="Készpénz (Futárnál)">Készpénz a futárnál</option>
-                        <option value="Bankkártya (Futárnál)">Bankkártya a futárnál</option>
-                        <option value="SZÉP Kártya - OTP">SZÉP Kártya (OTP)</option>
+                        <option value="Készpénz">Készpénz futárnál</option>
+                        <option value="Bankkártya">Bankkártya futárnál</option>
+                        <option value="SZÉP Kártya">OTP SZÉP Kártya</option>
                     </select>
-                    <div class="legal-checkbox-container">
-                        <label class="legal-label">
-                            <input type="checkbox" id="accept-terms" required>
-                            <span>Elfogadom a feltételeket.</span>
-                        </label>
-                    </div>
-                    <button type="submit" class="btn-gold block">Rendelés Leadása</button>
+                    <label style="font-size: 0.8rem; color: #888; display: block; margin-bottom: 1rem;">
+                        <input type="checkbox" required> Elfogadom a feltételeket.
+                    </label>
+                    <button type="submit" class="btn-gold">Rendelés Leadása</button>
                 </form>
             </div>
         </div>
     </div>
-    <div class="overlay" id="overlay"></div>
+    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:400;"></div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -58,28 +58,34 @@ function openModal(item) {
     const options = document.getElementById('modal-options');
     options.innerHTML = '';
 
-    if (item.kategoria === 'Pizzák') {
+    if (item.kategoria === 'Pizzák' || item.kategoria === 'Burgerek') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
-        options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
-        feltetek.forEach(f => {
-            options.querySelector('.topping-grid').innerHTML += `
-                <label class="topping-label" style="display:block; margin:5px 0; cursor:pointer;">
-                    <input type="checkbox" value="${f.nev}" data-price="${f.ar}" class="pizza-topping"> ${f.nev} (+${f.ar} Ft)
-                </label>`;
-        });
+        if (feltetek.length > 0) {
+            options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
+            const grid = options.querySelector('.topping-grid');
+            feltetek.forEach(f => {
+                grid.innerHTML += `
+                    <label class="topping-label">
+                        <input type="checkbox" value="${f.nev}" data-price="${f.ar}" class="extra-checkbox">
+                        <span>${f.nev} (+${f.ar} Ft)</span>
+                    </label>`;
+            });
+        }
     }
     document.getElementById('product-modal').style.display = 'flex';
 }
 
 document.getElementById('add-to-cart-btn').onclick = () => {
-    let price = currentSelectedItem.ar + PACKAGING_FEE;
-    let desc = '';
-    if (currentSelectedItem.kategoria === 'Pizzák') {
-        const selected = Array.from(document.querySelectorAll('.pizza-topping:checked'));
-        price += selected.reduce((sum, cb) => sum + parseInt(cb.dataset.price), 0);
-        if(selected.length > 0) desc = ` (+ ${selected.map(c => c.value).join(', ')})`;
-    }
-    cart.push({ nev: currentSelectedItem.nev + desc, ar: price });
+    let totalPrice = parseInt(currentSelectedItem.ar) + PACKAGING_FEE;
+    let extras = [];
+    const selected = document.querySelectorAll('.extra-checkbox:checked');
+    selected.forEach(cb => {
+        totalPrice += parseInt(cb.dataset.price);
+        extras.push(cb.value);
+    });
+
+    let desc = extras.length > 0 ? ` (+ ${extras.join(', ')})` : '';
+    cart.push({ nev: currentSelectedItem.nev + desc, ar: totalPrice });
     updateCartUI();
     document.getElementById('product-modal').style.display = 'none';
 };
@@ -91,7 +97,7 @@ function updateCartUI() {
     let total = 0;
     cart.forEach((item, i) => {
         total += item.ar;
-        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button onclick="removeFromCart(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px; font-weight:bold;">×</button></span></div>`;
+        container.innerHTML += `<div class="cart-item"><span>${item.nev}</span><span>${item.ar} Ft <button onclick="removeFromCart(${i})" style="color:red; background:none; border:none; cursor:pointer; margin-left:10px;">×</button></span></div>`;
     });
     document.getElementById('total-price').innerText = `${total} Ft`;
 }

@@ -11,7 +11,7 @@ let currentSelectedItem = null;
 
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
-// Főételek, amikhez jár az alap köretválasztó
+// Főételek alap köretei
 const koretesEtelek = [
     'Roston sült csirkemell, párolt jázmin rizs és kompót',
     'Rántott sajt, párolt jázmin rizs, tartár mártás',
@@ -19,7 +19,8 @@ const koretesEtelek = [
 ];
 
 const mainSides = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
-const burgerSides = ['Hasábburgonya', 'Házi steak burgonya'];
+// Burgerek köretei: Édesburgonyával kiegészítve
+const burgerSides = ['Hasábburgonya', 'Házi steak burgonya', 'Édesburgonya'];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const { data } = await supabase.from('etlap').select('*');
@@ -68,7 +69,7 @@ function openModal(item) {
     const options = document.getElementById('modal-options');
     options.innerHTML = '';
 
-    // 1. Pizzák EXTRÁK (Csak pizzánál jelenik meg!)
+    // 1. Pizzák EXTRÁK (Csak pizzánál)
     if (item.kategoria === 'Pizzák') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
         if (feltetek.length > 0) {
@@ -84,12 +85,12 @@ function openModal(item) {
         }
     }
 
-    // 2. KÖRETVÁLASZTÓ (Főételek és Burgerek)
+    // 2. KÖRETVÁLASZTÓ (Főételek és Burgerek külön listával)
     let selectedSides = [];
     if (item.kategoria === 'Burgerek') {
-        selectedSides = burgerSides; // Csak Hasáb vagy Steak burgonya
+        selectedSides = burgerSides; 
     } else if (koretesEtelek.includes(item.nev)) {
-        selectedSides = mainSides; // Teljes lista
+        selectedSides = mainSides; 
     }
 
     if (selectedSides.length > 0) {
@@ -108,14 +109,12 @@ document.getElementById('add-to-cart-btn').onclick = () => {
     let totalPrice = parseInt(currentSelectedItem.ar) + PACKAGING_FEE;
     let desc = '';
 
-    // Extrák (Csak ha vannak)
     const selected = document.querySelectorAll('.extra-checkbox:checked');
     selected.forEach(cb => {
         totalPrice += parseInt(cb.dataset.price);
         desc += `, ${cb.value}`;
     });
 
-    // Köret
     const sideSelect = document.getElementById('side-dish-select');
     if (sideSelect && sideSelect.value !== 'Eredeti körettel') {
         desc += ` (Köret: ${sideSelect.value})`;

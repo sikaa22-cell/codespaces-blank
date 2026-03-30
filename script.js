@@ -11,7 +11,14 @@ let menuData = [];
 let cart = [];
 let currentSelectedItem = null;
 
-const sideDishes = ['Hasábburgonya', 'Párolt rizs', 'Rizi-bizi', 'Steak burgonya', 'Édesburgonya hasáb', 'Párolt zöldség', 'Friss saláta'];
+// --- KÖRETVÁLASZTÓS ÉTELEK ---
+const koretesEtelek = [
+    'Roston sült csirkemell, párolt jázmin rizs és kompót',
+    'Rántott sajt, párolt jázmin rizs, tartár mártás',
+    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé'
+];
+
+const sideDishes = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
 const pizzaToppings = ['Sajt', 'Sonka', 'Gomba', 'Kukorica', 'Hagyma', 'Szalámi', 'Bacon', 'Ananász', 'Jalapeno', 'Olívabogyó', 'Tonhal', 'Tojás', 'Paradicsom', 'Paprika', 'Csirkemell', 'Rukkola', 'Parmezán', 'Fokhagyma', 'Tejföl', 'BBQ', 'Erős Pista', 'Kolbász'];
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -65,10 +72,8 @@ function openModal(item) {
         pizzaToppings.forEach(t => {
             grid.innerHTML += `<label class="topping-label"><input type="checkbox" value="${t}" class="pizza-topping"> ${t}</label>`;
         });
-    } else if (item.kategoria === 'Főételek') {
-        options.innerHTML = `<h4>Válassz köretet:</h4><select id="side-dish-select" style="width:100%; padding:0.8rem; margin-top:0.5rem; background:#2a2a2a; color:white; border:1px solid var(--gold);"><option value="Eredeti köret">Eredeti körettel kérem</option>${sideDishes.map(sd => `<option value="${sd}">${sd}</option>`).join('')}</select>`;
-    } else if (item.nev === 'Palacsinta') {
-        options.innerHTML = `<h4>Válassz tölteléket:</h4><select id="palacsinta-toltelek"><option value="Nutella">Nutella</option><option value="Kakaó">Kakaó</option><option value="Mák">Mák</option><option value="Túró">Túró</option></select>`;
+    } else if (koretesEtelek.includes(item.nev)) {
+        options.innerHTML = `<h4>Válassz köretet:</h4><select id="side-dish-select" style="width:100%; padding:0.8rem; margin-top:0.5rem; background:#2a2a2a; color:white; border:1px solid var(--gold);"><option value="Eredeti körettel">Eredeti körettel kérem</option>${sideDishes.map(sd => `<option value="${sd}">${sd}</option>`).join('')}</select>`;
     }
     document.getElementById('product-modal').style.display = 'flex';
 }
@@ -82,10 +87,9 @@ document.getElementById('add-to-cart-btn').onclick = () => {
         const selected = Array.from(document.querySelectorAll('.pizza-topping:checked')).map(c => c.value);
         price += selected.length * TOPPING_PRICE;
         if(selected.length > 0) desc = ` (+ ${selected.join(', ')})`;
-    } else if (currentSelectedItem.kategoria === 'Főételek') {
-        desc = ` (${document.getElementById('side-dish-select').value})`;
-    } else if (currentSelectedItem.nev === 'Palacsinta') {
-        desc = ` (${document.getElementById('palacsinta-toltelek').value})`;
+    } else if (koretesEtelek.includes(currentSelectedItem.nev)) {
+        const koret = document.getElementById('side-dish-select').value;
+        if(koret !== 'Eredeti körettel') desc = ` (Köret: ${koret})`;
     }
     cart.push({ nev: currentSelectedItem.nev + desc, ar: price });
     updateCartUI();
@@ -111,6 +115,8 @@ document.querySelector('.close-cart').onclick = () => document.getElementById('c
 
 document.getElementById('checkout-form').addEventListener('submit', async (e) => {
     e.preventDefault();
+    const finalTotal = cart.reduce((s, i) => s + i.ar, 0);
+
     const address = document.getElementById('order-address').value;
     const floor = document.getElementById('order-floor').value;
     const bell = document.getElementById('order-bell').value;
@@ -122,7 +128,7 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         telefon: document.getElementById('order-phone').value,
         fizetesi_mod: document.getElementById('order-payment').value,
         tetelek: cart,
-        vegosszeg: cart.reduce((s, i) => s + i.ar, 0)
+        vegosszeg: finalTotal
     };
     const { error } = await supabase.from('rendelesek').insert([order]);
     if(!error) { alert('Sikeres rendelés!'); cart = []; updateCartUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset(); }

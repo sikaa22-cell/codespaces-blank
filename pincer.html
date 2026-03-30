@@ -35,7 +35,7 @@
                 <h3>${order.nev} - ${order.telefon}</h3>
                 <p>📍 Cím: <strong>${order.cim}</strong></p>
                 <p style="color:var(--gold);">💳 Fizetés: ${order.fizetesi_mod}</p>
-                <ul>${order.tetelek.map(t => `<li>${t.nev} - ${t.ar} Ft</li>`).join('')}</ul>
+                <ul>${order.tetelek.map(t => `<li>${t.nev}</li>`).join('')}</ul>
                 <h2 class="gold-text">${order.vegosszeg} Ft</h2>
                 <button class="btn-gold block" onclick="this.parentElement.remove()">Kész / Törlés</button>
             `;

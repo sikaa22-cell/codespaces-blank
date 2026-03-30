@@ -49,7 +49,7 @@
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('admin-content').style.display = 'block';
                 load(); setupRealtime(); notify('Sikeres belépés!');
-            } else { alert('Hiba!'); }
+            } else { alert('Helytelen jelszó!'); }
         };
         async function load() {
             const { data } = await supabase.from('etlap').select('*').order('kategoria');

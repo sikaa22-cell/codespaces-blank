@@ -11,17 +11,20 @@ let currentSelectedItem = null;
 
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
+// --- KÖRETVÁLASZTÓS ÉTELEK (Itt adtuk hozzá az újakat!) ---
 const koretesEtelek = [
     'Roston sült csirkemell, párolt jázmin rizs és kompót',
     'Rántott sajt, párolt jázmin rizs, tartár mártás',
-    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé'
+    'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé',
+    'Rántott sajt',
+    'Roston sült csirkemell',
+    'Csirkefalatok'
 ];
 
 const mainSides = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajtos rukkolás burgonyapüré', 'Házi steak burgonya'];
 const burgerSides = ['Hasábburgonya', 'Házi steak burgonya', 'Édesburgonya'];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // CSAK A LÁTHATÓ TÉTELEK BETÖLTÉSE
     const { data } = await supabase.from('etlap').select('*').eq('lathatosag', true);
     if (data) {
         menuData = data;
@@ -85,7 +88,7 @@ function openModal(item) {
     else if (koretesEtelek.includes(item.nev)) sides = mainSides;
 
     if (sides.length > 0) {
-        options.innerHTML += `<h4>Köret:</h4><select id="side-select" style="width:100%; padding:10px; margin:10px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
+        options.innerHTML += `<h4>Köret választás:</h4><select id="side-select" style="width:100%; padding:10px; margin:15px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
             <option value="Eredeti körettel">Eredeti körettel</option>
             ${sides.map(s => `<option value="${s}">${s}</option>`).join('')}
         </select>`;
@@ -138,5 +141,5 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         vegosszeg: cart.reduce((s, i) => s + i.ar, 0)
     };
     await supabase.from('rendelesek').insert([order]);
-    alert('Sikeres rendelés!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
+    alert('Rendelés elküldve!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
 });

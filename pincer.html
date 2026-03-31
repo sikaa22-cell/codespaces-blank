@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="style.css">
     <style>
         body { padding: 2rem; max-width: 900px; margin: 0 auto; background: #121212; color: #f0f0f0; }
-        .order-card { background: #1e1e1e; border: 2px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 12px; position: relative; }
+        .order-card { background: #1e1e1e; border: 2px solid #333; padding: 20px; margin-bottom: 20px; border-radius: 12px; position: relative; transition: 0.3s; }
         .order-card.new { border-color: #ff4c4c; animation: pulse 2s infinite; }
         .order-card.accepted { border-color: #2ecc71; background: #1a2a1f; }
         .order-num { position: absolute; top: -15px; left: 20px; background: #c5a059; color: #000; padding: 5px 15px; border-radius: 20px; font-weight: bold; }
@@ -35,7 +35,7 @@
         document.getElementById('enable-notifications').onclick = () => {
             Notification.requestPermission();
             alertSound.play(); alertSound.pause();
-            alert('A pincér rendszer készletben!');
+            alert('A pincér rendszer készenlétben!');
         };
 
         function renderOrder(order, isNew = false) {

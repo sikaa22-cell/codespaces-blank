@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sár-Kert Étterem | Rendelés</title>
+    <title>Sár-Kert Étterem | Online Rendelés</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -31,15 +31,14 @@
                     <strong>Üzemeltető:</strong> Sár-Kert Kft.<br>
                     <strong>Székhely:</strong> 7030 Paks, Szent János utca 15.<br>
                     <strong>Adószám:</strong> 32347278-2-17<br>
-                    <strong>Cégjegyzékszám:</strong> 17 09 013742<br>
                     <strong>Kapcsolat:</strong> 0620 530 5848 | info@sarkertpaks.hu
                 </p>
             </div>
             <div class="footer-section">
                 <h3>Jogi Információk</h3>
                 <ul>
-                    <li>ÁSZF</li>
-                    <li>Adatkezelési Tájékoztató</li>
+                    <li><a href="#">ÁSZF</a></li>
+                    <li><a href="#">Adatkezelési Tájékoztató</a></li>
                 </ul>
             </div>
         </div>
@@ -62,7 +61,7 @@
         </div>
         <div class="cart-scroll-area">
             <div id="cart-items"></div>
-            <div class="cart-total" style="padding: 1.5rem 0; border-top: 2px solid #c5a059; margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1.3rem;">
+            <div class="cart-total-box">
                 <span>Végösszeg:</span>
                 <span id="total-price" class="gold-text">0 Ft</span>
             </div>
@@ -72,8 +71,8 @@
                     <input type="text" id="order-name" placeholder="Név" required>
                     <input type="text" id="order-address" placeholder="Utca, házszám" required>
                     <div class="form-row">
-                        <input type="text" id="order-floor" placeholder="Emelet/Ajtó">
-                        <input type="text" id="order-bell" placeholder="Kapucsengő">
+                        <input type="text" id="order-floor" placeholder="Em./Ajtó">
+                        <input type="text" id="order-bell" placeholder="Csengő">
                     </div>
                     <input type="tel" id="order-phone" placeholder="Telefonszám" required>
                     <select id="order-payment" required>
@@ -82,7 +81,7 @@
                         <option value="Bankkártya">Bankkártya futárnál</option>
                         <option value="SZÉP Kártya">OTP SZÉP Kártya</option>
                     </select>
-                    <label style="font-size: 0.8rem; color: #888; display: block; margin-bottom: 1rem;">
+                    <label class="legal-check">
                         <input type="checkbox" required> Elfogadom a feltételeket.
                     </label>
                     <button type="submit" class="btn-gold">Rendelés Leadása</button>
@@ -90,7 +89,8 @@
             </div>
         </div>
     </div>
-    <div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:400;"></div>
+
+    <div id="overlay" class="overlay"></div>
     <script type="module" src="script.js"></script>
 </body>
 </html>

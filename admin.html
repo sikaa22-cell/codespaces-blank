@@ -40,7 +40,7 @@
 
         <table>
             <thead>
-                <tr><th>Aktív</th><th>Kategória</th><th>Név</th><th>Ár</th><th style="text-align:right;">Műveletek</th></tr>
+                <tr><th>Látható</th><th>Kategória</th><th>Név</th><th>Ár</th><th style="text-align:right;">Műveletek</th></tr>
             </thead>
             <tbody id="tbody"></tbody>
         </table>
@@ -84,7 +84,7 @@
             const n = document.getElementById(`n-${id}`).value;
             const p = parseInt(document.getElementById(`p-${id}`).value);
             await supabase.from('etlap').update({ nev: n, ar: p }).eq('id', id);
-            alert('Kész!');
+            alert('Frissítve!');
         };
 
         window.updateVis = async (id, s) => {

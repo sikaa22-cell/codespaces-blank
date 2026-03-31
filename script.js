@@ -21,7 +21,7 @@ const mainSides = ['Hasábburgonya', 'Jázmin rizs', 'Édesburgonya', 'Kéksajto
 const burgerSides = ['Hasábburgonya', 'Házi steak burgonya', 'Édesburgonya'];
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // CSAK LÁTHATÓ TÉTELEK
+    // CSAK A LÁTHATÓ TÉTELEK BETÖLTÉSE
     const { data } = await supabase.from('etlap').select('*').eq('lathatosag', true);
     if (data) {
         menuData = data;
@@ -68,7 +68,6 @@ function openModal(item) {
     const options = document.getElementById('modal-options');
     options.innerHTML = '';
 
-    // 1. Pizzák Feltétei (Csak itt!)
     if (item.kategoria === 'Pizzák') {
         const feltetek = menuData.filter(m => m.kategoria === 'Feltét');
         options.innerHTML = '<h4>Extrák:</h4><div class="topping-grid"></div>';
@@ -81,18 +80,15 @@ function openModal(item) {
         });
     }
 
-    // 2. Köret Választó (Burgerek és Főételek)
     let sides = [];
     if (item.kategoria === 'Burgerek') sides = burgerSides;
     else if (koretesEtelek.includes(item.nev)) sides = mainSides;
 
     if (sides.length > 0) {
-        options.innerHTML += `
-            <h4>Köret választás:</h4>
-            <select id="side-select" style="width:100%; padding:10px; margin:15px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
-                <option value="Eredeti körettel">Eredeti körettel</option>
-                ${sides.map(s => `<option value="${s}">${s}</option>`).join('')}
-            </select>`;
+        options.innerHTML += `<h4>Köret:</h4><select id="side-select" style="width:100%; padding:10px; margin:10px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
+            <option value="Eredeti körettel">Eredeti körettel</option>
+            ${sides.map(s => `<option value="${s}">${s}</option>`).join('')}
+        </select>`;
     }
 
     document.getElementById('product-modal').style.display = 'flex';
@@ -101,15 +97,11 @@ function openModal(item) {
 document.getElementById('add-to-cart-btn').onclick = () => {
     let price = parseInt(currentSelectedItem.ar) + PACKAGING_FEE;
     let desc = '';
-    
-    // Extrák
     const selected = document.querySelectorAll('.extra-checkbox:checked');
     selected.forEach(cb => {
         price += parseInt(cb.dataset.price);
         desc += `, ${cb.value}`;
     });
-
-    // Köret
     const side = document.getElementById('side-select');
     if (side && side.value !== 'Eredeti körettel') desc += ` (${side.value})`;
 
@@ -146,5 +138,5 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         vegosszeg: cart.reduce((s, i) => s + i.ar, 0)
     };
     await supabase.from('rendelesek').insert([order]);
-    alert('Rendelés elküldve!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
+    alert('Sikeres rendelés!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
 });

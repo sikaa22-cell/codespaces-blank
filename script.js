@@ -11,11 +11,11 @@ let currentSelectedItem = null;
 
 const categoryOrder = ['Levesek', 'Főételek', 'Burgerek', 'Pizzák', 'Desszertek', 'Italok'];
 
-// --- KÖRETVÁLASZTÓS ÉTELEK (Itt adtuk hozzá az újakat!) ---
 const koretesEtelek = [
-    'Roston sült csirkemell, párolt jázmin rizs és kompót',
-    'Rántott sajt, párolt jázmin rizs, tartár mártás',
     'Óriás rántott sertés karaj, rizs, borsó és házi csalamádé',
+    'Roston sült csirkemell, párolt jázmin rizs és kompót (Gyerekeknek)',
+    'Rántott sajt, párolt jázmin rizs, tartár mártás (Gyerekeknek)',
+    'Csirkefalatok mosolygós burgonyával és ketchuppal (Gyerekeknek)',
     'Rántott sajt',
     'Roston sült csirkemell',
     'Csirkefalatok'
@@ -84,11 +84,14 @@ function openModal(item) {
     }
 
     let sides = [];
+    const normalizedName = item.nev.trim().toLowerCase();
+    const isKoretes = koretesEtelek.some(k => k.trim().toLowerCase() === normalizedName);
+
     if (item.kategoria === 'Burgerek') sides = burgerSides;
-    else if (koretesEtelek.includes(item.nev)) sides = mainSides;
+    else if (isKoretes) sides = mainSides;
 
     if (sides.length > 0) {
-        options.innerHTML += `<h4>Köret választás:</h4><select id="side-select" style="width:100%; padding:10px; margin:15px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
+        options.innerHTML += `<h4>Köret választás:</h4><select id="side-select" style="width:100%; padding:10px; margin:10px 0; background:#2a2a2a; color:white; border:1px solid #c5a059; border-radius:5px;">
             <option value="Eredeti körettel">Eredeti körettel</option>
             ${sides.map(s => `<option value="${s}">${s}</option>`).join('')}
         </select>`;
@@ -137,9 +140,10 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         cim: `${document.getElementById('order-address').value}, ${document.getElementById('order-floor').value}, ${document.getElementById('order-bell').value}`,
         telefon: document.getElementById('order-phone').value,
         fizetesi_mod: document.getElementById('order-payment').value,
+        megjegyzes: document.getElementById('order-comment').value, // ÚJ MEZŐ HOZZÁADVA
         tetelek: cart,
         vegosszeg: cart.reduce((s, i) => s + i.ar, 0)
     };
     await supabase.from('rendelesek').insert([order]);
-    alert('Rendelés elküldve!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
+    alert('Sikeres rendelés!'); cart = []; updateUI(); document.getElementById('cart-sidebar').classList.remove('open'); e.target.reset();
 });
